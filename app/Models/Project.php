@@ -15,14 +15,18 @@ class Project extends Model
         'end_date',
         'assigned_team_id',
         'status',
-        'linked_lead_id',
+        
     ];
     
     /**
      * Get the lead associated with this project
      */
-    public function lead()
+    // public function lead()
+    // {
+    //     return $this->belongsTo(Lead::class, 'linked_lead_id', 'lead_id');
+    // }
+    public function materialLogs()
     {
-        return $this->belongsTo(Lead::class, 'linked_lead_id', 'lead_id');
+        return $this->hasMany(ProjectMaterialLog::class);
     }
 }

@@ -1,0 +1,55 @@
+@extends('admin.layouts.app')
+@section('content')
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+                <div class="container">
+                    <h3>Edit Project</h3>
+
+                    <form action="{{ route('projects.update', $project->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>Project Name</label>
+                                <input type="text" name="project_name" value="{{ $project->project_name }}"
+                                    class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label>Status</label>
+                                <select name="status" class="form-control">
+                                    <option value="Not Started" @selected($project->status == 'Not Started')>Not Started</option>
+                                    <option value="In Progress" @selected($project->status == 'In Progress')>In Progress</option>
+                                    <option value="Completed" @selected($project->status == 'Completed')>Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label>Start Date</label>
+                                <input type="date" name="start_date" value="{{ $project->start_date }}"
+                                    class="form-control">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label>End Date</label>
+                                <input type="date" name="end_date" value="{{ $project->end_date }}" class="form-control">
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label>Description</label>
+                                <textarea name="description" class="form-control">{{ $project->description }}</textarea>
+                            </div>
+
+                            
+                        </div>
+
+                        <button class="btn btn-primary">Update Project</button>
+                        <a href="{{ route('projects.index') }}" class="btn btn-secondary">Back</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

@@ -12,10 +12,10 @@
         </a> --}}
         <a href="{{ route('dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
-                <img src="{{ asset('/assets/images/logo-sm.png') }}" alt="" height="40">
+                <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="40">
             </span>
             <span class="logo-lg">
-                <img src="{{ asset('/assets/images/logo-light1.png') }}" alt="" height="52" width="200"
+                <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="52" width="200"
                     >
             </span>
         </a>
@@ -41,28 +41,52 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('leads.index') }}"
-                        class="nav-link menu-link {{ Request::routeIs('leads') }}" data-bs-toggle="tooltip"
+                        class="nav-link menu-link {{ Request::routeIs('leads.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
                         data-bs-placement="right">
-                        <i class="ph-user"></i>
+                        <i class="ph ph-chats"></i>
                         <span data-key="t-leads">Leads Management</span>
                     </a>
                 </li>
 
+               
                 <li class="nav-item">
-                    <a href="{{ route('teams.index') }}"
-                        class="nav-link menu-link {{ Request::routeIs('teams') }}" data-bs-toggle="tooltip"
+                    <a href="{{ route('complaints.index') }}"
+                        class="nav-link menu-link {{ Request::routeIs('complaints.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
                         data-bs-placement="right">
-                        <i class="ph-user"></i>
-                        <span data-key="t-teams">Teams</span>
+                        <i class="ph-warning"></i>
+                        <span data-key="t-projects">Complaints</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('estimates.index') }}"
+                        class="nav-link menu-link {{ Request::routeIs('estimates.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
+                        data-bs-placement="right">
+                        <i class="ph-file-text"></i>
+                        <span data-key="t-projects">Estimate</span>
+                    </a>
+                </li> <li class="nav-item">
+                    <a href="{{ route('technicians.index') }}"
+                        class="nav-link menu-link {{ Request::routeIs('technicians.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
+                        data-bs-placement="right">
+                        <i class="ph ph-users"></i>
+                        <span data-key="t-teams">Technicians</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a href="{{ route('projects.index') }}"
-                        class="nav-link menu-link {{ Request::routeIs('project') }}" data-bs-toggle="tooltip"
+                        class="nav-link menu-link {{ Request::routeIs('projects.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
                         data-bs-placement="right">
-                        <i class="ph-user"></i>
+                        <i class="ph-briefcase"></i>
                         <span data-key="t-projects">Project Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('replacements.index') }}"
+                        class="nav-link menu-link {{ Request::routeIs('replacements.*') ? 'active' : '' }}" data-bs-toggle="tooltip"
+                        data-bs-placement="right">
+                        <i class="ph-briefcase"></i>
+                        <span data-key="t-projects">Item Replacement</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -73,8 +97,8 @@
                         <span data-key="t-dashboard">Log out</span>
                     </a> --}}
                     <a href="{{ route('logout') }}"
-                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link menu-link" data-bs-placement="right" data-bs-toggle="tooltip"><i
-                                class="mdi mdi-logout text-muted fs-lg align-middle me-1"></i>
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link menu-link text-danger" data-bs-placement="right" data-bs-toggle="tooltip">
+                                <i class="mdi mdi-logout"></i>
                             <span  data-key="t-dashboard">Logout</span>
                         </a>
                 </li>
@@ -100,21 +124,21 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="#" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="{{ asset('/assets/images/logo-sm.png') }}" alt="" height="18">
+                            <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="18">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ asset('/assets/images/logo.png') }}" alt="" height="18"
+                            <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="18"
                                 style="filter: brightness(-1)">
                         </span>
                     </a>
 
                     <a href="#" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="{{ asset('/assets/images/logo-sm.png') }}" alt="" height="18"
+                            <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="18"
                                 style="filter: brightness(-1)">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ asset('/assets/images/logo.png') }}" alt="" height="18"
+                            <img src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="" height="18"
                                 style="filter: brightness(-1)">
                         </span>
                     </a>
@@ -161,12 +185,12 @@
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
                             <img class="rounded-circle header-profile-user"
-                                src="{{ asset('/assets/images/users/32/photo.jpg') }}" alt="Header Avatar">
+                                src="{{ asset('/assets/images/DIAMOND-IT.png') }}" alt="Header Avatar">
 
                             <span class="text-start ms-xl-2">
                                 <span
                                     class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name }}</span>
-                                <span class="d-none d-xl-block ms-1 fs-sm user-name-sub-text">Administrator</span>
+                                {{-- <span class="d-none d-xl-block ms-1 fs-sm user-name-sub-text">Administrator</span> --}}
                             </span>
                         </span>
                     </button>

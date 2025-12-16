@@ -1,122 +1,226 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="main-content">
-    <div class="page-content">
-        <div class="container-fluid">
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
 
-            <div class="container">
-                <h2>Edit Lead</h2>
-                <a href="{{ route('leads.index') }}" class="btn btn-secondary mb-3">Back to Leads</a>
+                <div class="container">
 
-                <!-- Display validation errors -->
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>Edit CCTV Lead</h2>
+                        <a href="{{ route('leads.index') }}" class="btn btn-secondary">Back to Leads</a>
                     </div>
-                @endif
 
-                <!-- Form to update lead -->
-                <form action="{{ route('leads.update', ['lead' => $lead->lead_id]) }}" method="POST">
-                    @csrf
-                    @method('PUT') <!-- Use PUT method for updating -->
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label>Customer Name</label>
-                                <input type="text" name="customer_name" class="form-control" value="{{ old('customer_name', $lead->customer_name) }}" required>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" value="{{ old('email', $lead->email) }}" required>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Country</label>
-                                <input type="text" name="country" class="form-control" value="{{ old('country', $lead->country) }}">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Contact Number</label>
-                                <input type="text" name="contact_number" class="form-control" value="{{ old('contact_number', $lead->contact_number) }}">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Website</label>
-                                <input type="url" name="website" class="form-control" value="{{ old('website', $lead->website) }}">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Lead Source</label>
-                                <select name="lead_source" class="form-control">
-                                    <option value="Website" {{ $lead->lead_source == 'Website' ? 'selected' : '' }}>Website</option>
-                                    <option value="Referral" {{ $lead->lead_source == 'Referral' ? 'selected' : '' }}>Referral</option>
-                                    <option value="Social Media" {{ $lead->lead_source == 'Social Media' ? 'selected' : '' }}>Social Media</option>
-                                    <option value="Event" {{ $lead->lead_source == 'Event' ? 'selected' : '' }}>Event</option>
-                                </select>
-                            </div>
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
+                    @endif
 
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label>Service Required</label>
-                                <select name="service_required" class="form-control">
-                                    <option value="Consulting" {{ $lead->service_required == 'Consulting' ? 'selected' : '' }}>Consulting</option>
-                                    <option value="Development" {{ $lead->service_required == 'Development' ? 'selected' : '' }}>Development</option>
-                                    <option value="Marketing" {{ $lead->service_required == 'Marketing' ? 'selected' : '' }}>Marketing</option>
-                                </select>
+                    <form action="{{ route('leads.update', $lead->lead_id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="row">
+                            <!-- LEFT COLUMN -->
+                            <div class="col-md-6">
+
+                                <div class="form-group mb-3">
+                                    <label>Customer / Contact Name</label>
+                                    <input type="text" name="customer_name" class="form-control"
+                                        value="{{ old('customer_name', $lead->customer_name) }}" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Primary Phone</label>
+                                    <input type="tel" name="contact_number" class="form-control"
+                                        value="{{ old('contact_number', $lead->contact_number) }}" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Site / Installation Address</label>
+                                    <textarea name="site_address" class="form-control" rows="3">{{ old('site_address', $lead->site_address) }}</textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>City / Locality</label>
+                                    <input type="text" name="city" class="form-control"
+                                        value="{{ old('city', $lead->city) }}">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Property Type</label>
+                                    <select name="property_type" class="form-control">
+                                        <option value="Residential" {{ $lead->property_type == 'Residential' ? 'selected' : '' }}>
+                                            Residential</option>
+                                        <option value="Commercial" {{ $lead->property_type == 'Commercial' ? 'selected' : '' }}>
+                                            Commercial</option>
+                                        <option value="Industrial" {{ $lead->property_type == 'Industrial' ? 'selected' : '' }}>
+                                            Industrial</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Approx. Area</label>
+                                    <input type="text" name="site_area" class="form-control"
+                                        value="{{ old('site_area', $lead->site_area) }}">
+                                </div>
+
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label>Status</label>
-                                <select name="status" class="form-control">
-                                    <option value="New" {{ $lead->status == 'New' ? 'selected' : '' }}>New</option>
-                                    <option value="Contacted" {{ $lead->status == 'Contacted' ? 'selected' : '' }}>Contacted</option>
-                                    <option value="Qualified" {{ $lead->status == 'Qualified' ? 'selected' : '' }}>Qualified</option>
-                                    <option value="Converted" {{ $lead->status == 'Converted' ? 'selected' : '' }}>Converted</option>
-                                    <option value="Lost" {{ $lead->status == 'Lost' ? 'selected' : '' }}>Lost</option>
-                                </select>
-                            </div>
+                            <!-- RIGHT COLUMN -->
+                            <div class="col-md-6">
 
-                            <div class="form-group mb-3">
-                                <label>Follow Up Date</label>
-                                <input type="datetime-local" name="follow_up_date" class="form-control" value="{{ old('follow_up_date', date('Y-m-d\TH:i', strtotime($lead->follow_up_date))) }}" required>
-                            </div>
+                                <div class="form-group mb-3">
+                                    <label>Number of Cameras</label>
+                                    <input type="number" min="0" name="num_cameras" class="form-control"
+                                        value="{{ old('num_cameras', $lead->num_cameras) }}">
+                                </div>
 
-                            <div class="form-group mb-3">
-                                <label>Received Date</label>
-                                <input type="date" name="received_date" class="form-control" value="{{ old('received_date', $lead->received_date) }}" required>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>LinkedIn Profile</label>
-                                <input type="url" name="linkedin_profile" class="form-control" value="{{ old('linkedin_profile', $lead->linkedin_profile) }}">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label>Assigned To</label>
-                                <select name="assigned_to" class="form-control">
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $lead->assigned_to == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }}
+                                <div class="form-group mb-3">
+                                    <label>Camera Type</label>
+                                    <select name="camera_type" class="form-control">
+                                        <option value="WI-FI" {{ $lead->camera_type == 'WI-FI' ? 'selected' : '' }}>WI-FI
                                         </option>
-                                    @endforeach
-                                </select>
+                                        <option value="HD-Camera" {{ $lead->camera_type == 'HD-Camera' ? 'selected' : '' }}>HD
+                                            Camera</option>
+                                        <option value="IP Camera" {{ $lead->camera_type == 'IP Camera' ? 'selected' : '' }}>IP
+                                            Camera</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Features Required</label>
+
+                                    @php
+                                        $selected = is_array($lead->features)
+                                            ? $lead->features
+                                            : json_decode($lead->features, true) ?? [];
+                                    @endphp
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="Night Vision"
+                                                    {{ in_array('Night Vision', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">Night Vision</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="Remote Viewing"
+                                                    {{ in_array('Remote Viewing', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">Remote Viewing</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="PTZ" {{ in_array('PTZ', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">PTZ / Motorized</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="Infrared"
+                                                    {{ in_array('Infrared', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">Infrared / Low Light</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="Audio" {{ in_array('Audio', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">Two-way Audio</label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="features[]"
+                                                    value="Cloud" {{ in_array('Cloud', $selected) ? 'checked' : '' }}>
+                                                <label class="form-check-label">Cloud Storage</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group mb-3">
+                                    <label>Installation Required?</label>
+                                    <select name="installation_required" class="form-control">
+                                        <option value="Yes" {{ $lead->installation_required == 'Yes' ? 'selected' : '' }}>Yes
+                                        </option>
+                                        <option value="No" {{ $lead->installation_required == 'No' ? 'selected' : '' }}>No
+                                            (Supply only)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Preferred Visit Date</label>
+                                    <input type="datetime-local" name="preferred_date" class="form-control"
+                                        value="{{ $lead->preferred_date ? $lead->preferred_date->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Budget</label>
+                                    <input type="text" name="budget" class="form-control"
+                                        value="{{ old('budget', $lead->budget) }}">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Lead Source</label>
+                                    <select name="lead_source" class="form-control">
+                                        <option value="Walk-in" {{ $lead->lead_source == 'Walk-in' ? 'selected' : '' }}>Walk-in
+                                        </option>
+                                        <option value="Referral" {{ $lead->lead_source == 'Referral' ? 'selected' : '' }}>
+                                            Referral</option>
+                                        <option value="Social Media"
+                                            {{ $lead->lead_source == 'Social Media' ? 'selected' : '' }}>Social Media</option>
+                                        <option value="Telemark" {{ $lead->lead_source == 'Telemark' ? 'selected' : '' }}>
+                                            Tele/Call</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="New" {{ $lead->status == 'New' ? 'selected' : '' }}>New</option>
+                                        <option value="Contacted" {{ $lead->status == 'Contacted' ? 'selected' : '' }}>Contacted
+                                        </option>
+                                        <option value="Site Survey" {{ $lead->status == 'Site Survey' ? 'selected' : '' }}>Site
+                                            Survey</option>
+                                        <option value="Quoted" {{ $lead->status == 'Quoted' ? 'selected' : '' }}>Quoted</option>
+                                        <option value="Converted" {{ $lead->status == 'Converted' ? 'selected' : '' }}>Converted
+                                        </option>
+                                        <option value="Lost" {{ $lead->status == 'Lost' ? 'selected' : '' }}>Lost</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Follow Up Date</label>
+                                    <input type="datetime-local" name="follow_up_date" class="form-control"
+                                        value="{{ $lead->follow_up_date ? $lead->follow_up_date->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Internal Notes</label>
+                                    <textarea name="notes" rows="3" class="form-control">{{ old('notes', $lead->notes) }}</textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Update Lead</button>
                             </div>
-
-                            <button type="submit" class="btn btn-success">Update Lead</button>
                         </div>
-                    </div>
-                </form>
-            </div>
 
+                    </form>
+
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
 @endsection

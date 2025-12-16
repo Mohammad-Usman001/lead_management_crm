@@ -5,78 +5,122 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
+use App\Models\Estimate;
+use App\Models\Complaint;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Cache for performance (5 mins)
-        $totalLeads = Cache::remember('total_leads', 300, fn() => Lead::count());
-        $convertedLeads = Cache::remember('converted_leads', 300, fn() => Lead::where('status', 'converted')->count());
+     // Shared filters
+        $search    = $request->query('search');
+        $fromDate  = $request->query('created_at');
+        $toDate    = $request->query('to_date');
+        $assigned  = $request->query('assigned_to');
 
-        // Leads by Status
-        $leadStatuses = Cache::remember('lead_status_data', 300, function () {
-            return Lead::select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->get();
-        });
+        // Per-resource status filters
+        $leadStatus      = $request->query('lead_status');
+        $estimateStatus  = $request->query('estimate_status');
+        $complaintStatus = $request->query('complaint_status');
 
-        $leadStatusLabels = $leadStatuses->pluck('status')->toArray();
-        $leadStatusCounts = $leadStatuses->pluck('count')->toArray();
+        // --- LEADS QUERY ---
+        $leadsQuery = Lead::query()->with('assignedUser');
 
-        // Leads by Service Required
-        $leadServices = Cache::remember('lead_service_data', 300, function () {
-            return Lead::select('service_required', DB::raw('count(*) as count'))
-                ->groupBy('service_required')
-                ->get();
-        });
-
-        $leadServiceLabels = $leadServices->pluck('service_required')->toArray();
-        $leadServiceCounts = $leadServices->pluck('count')->toArray();
-
-        // Follow-Up Timeline (Calendar View)
-        $followUps = Lead::whereNotNull('follow_up_date')
-    ->selectRaw('customer_name as id, follow_up_date as start, customer_name as title') // Replacing id
-    ->orderBy('follow_up_date', 'asc')
-    ->get()
-    ->toArray();
-
-    
-
-        return view('dashboard', compact(
-            'totalLeads',
-            'convertedLeads',
-            'leadStatusLabels', 'leadStatusCounts',
-            'leadServiceLabels', 'leadServiceCounts',
-            'followUps'
-        ));
-    }
-
-    public function getData()
-    {
-        $leadStatuses = Lead::select('status', DB::raw('count(*) as count'))
-            ->groupBy('status')
-            ->get();
-            
-        $leadServices = Lead::select('service_required', DB::raw('count(*) as count'))
-            ->groupBy('service_required')
-            ->get();
-            
-        $followUps = Lead::whereNotNull('follow_up_date')
-            ->get()
-            ->map(function ($lead) {
-                return [
-                    'title' => $lead->customer_name,
-                    'start' => $lead->follow_up_date->format('Y-m-d'),
-                ];
+        if ($search) {
+            $leadsQuery->where(function($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhere('contact_number', 'like', "%{$search}%")
+                  ->orWhere('site_address', 'like', "%{$search}%");
             });
-            
-        return response()->json([
-            'leadStatusLabels' => $leadStatuses->pluck('status')->toArray(),
-            'leadStatusCounts' => $leadStatuses->pluck('count')->toArray(),
-            'leadServiceRequiredLabels' => $leadServices->pluck('service_required')->toArray(),
-            'leadServiceRequiredCounts' => $leadServices->pluck('count')->toArray(),
-            'followUps' => $followUps,
-        ]);
+        }
+
+        if ($leadStatus) {
+            $leadsQuery->where('status', $leadStatus);
+        }
+
+        if ($assigned) {
+            $leadsQuery->where('assigned_to', $assigned);
+        }
+
+        if ($fromDate) {
+            $leadsQuery->whereDate('created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $leadsQuery->whereDate('created_at', '<=', $toDate);
+        }
+
+        $leads = $leadsQuery->orderBy('created_at', 'desc')
+                            ->paginate(6, ['*'], 'leads_page');
+
+        // --- ESTIMATES QUERY ---
+        $estQuery = Estimate::query();
+
+        if ($search) {
+            $estQuery->where(function($q) use ($search) {
+                $q->where('invoice_no', 'like', "%{$search}%")
+                  ->orWhere('client_name', 'like', "%{$search}%")
+                  ->orWhere('client_phone', 'like', "%{$search}%")
+                  ;
+            });
+        }
+
+        if ($estimateStatus) {
+            // if you have a status column on estimates; otherwise skip this
+            $estQuery->where('status', $estimateStatus);
+        }
+
+        if ($fromDate) $estQuery->whereDate('created_at', '>=', $fromDate);
+        if ($toDate)   $estQuery->whereDate('created_at', '<=', $toDate);
+
+        $estimates = $estQuery->orderBy('created_at', 'desc')
+                              ->paginate(6, ['*'], 'estimates_page');
+
+        // --- COMPLAINTS QUERY ---
+        $compQuery = Complaint::query()->with('assignedUser');
+
+        if ($search) {
+            $compQuery->where(function($q) use ($search) {
+                $q->where('customer_name', 'like', "%{$search}%")
+                  ->orWhere('serial_number', 'like', "%{$search}%")
+                  ->orWhere('device_type', 'like', "%{$search}%")
+                  ->orWhere('issue_description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($complaintStatus) {
+            $compQuery->where('status', $complaintStatus);
+        }
+
+        if ($assigned) {
+            $compQuery->where('assigned_to', $assigned);
+        }
+
+        if ($fromDate) $compQuery->whereDate('created_at', '>=', $fromDate);
+        if ($toDate)   $compQuery->whereDate('created_at', '<=', $toDate);
+
+        $complaints = $compQuery->orderBy('created_at', 'desc')
+                                ->paginate(6, ['*'], 'complaints_page');
+
+        // Summary counts for "New" items
+        $counts = [
+            'leads_new'      => Lead::where('status', 'New')->count(),
+            'today_leads'   => Lead::whereDate('created_at', today())->count(),
+            'today_estimates'=> Estimate::whereDate('created_at', today())->count(),
+            'today_complaints'=> Complaint::whereDate('created_at', today())->count(),
+            'estimates_total'=> Estimate::count(),
+            'complaints_new' => Complaint::where('status', 'New')->count(),
+        ];
+
+        // Users for assigned filter
+        $users = User::select('id','name')->orderBy('name')->get();
+
+        // Return view with everything
+        return view('dashboard', compact(
+            'leads','estimates','complaints','counts','users',
+            'search','fromDate','toDate','assigned',
+            'leadStatus','estimateStatus','complaintStatus'
+        ));
     }
 }
